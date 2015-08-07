@@ -88,16 +88,16 @@ public class Fenci {
 
     private void cutHanAll(String block, List<String> wordList) throws IOException {
         List<List<Integer>> dag = getDag(block);
-        int old=-1;
+        int old = -1;
         for (int i = 0; i < dag.size(); i++) {
             List<Integer> list = dag.get(i);
-            if(list.size()==1 && i>old){
-                wordList.add(block.substring(i,list.get(0)+1));
-            }else{
-                for(Integer j :list){
-                    if(j>i){
-                        wordList.add(block.substring(i,j+1));
-                        old=j;
+            if (list.size() == 1 && i > old) { //如果只有一个字，且前面的词里不包含这个字，则将这个字作为一个词
+                wordList.add(block.substring(i, list.get(0) + 1));
+            } else {
+                for (Integer j : list) { //如果有字，且有词，则丢掉字，返回所有词
+                    if (j > i) {//丢掉字
+                        wordList.add(block.substring(i, j + 1));
+                        old = j;
                     }
                 }
             }
@@ -115,6 +115,16 @@ public class Fenci {
         }
     }
 
+    /**
+     * 获取Dag,即对于每个字符，如果和后面的字符可以组成一个词，则连线。比如
+     * 我  来  到  北  京  清  华  大  学
+     * 返回的Dag为：[0], [1,2],   [2], [3,4],   [4], [5,6,8],         [6,7],   [7,8],   [8]
+     * 即:         [我],[来,来到],[到],[北,北京],[京],[清,清华,清华大学],[华,华大],[大,大学],[学]
+     *
+     * @param block
+     * @return
+     * @throws IOException
+     */
     private List<List<Integer>> getDag(String block) throws IOException {
         char[] chars = block.toCharArray();
         List<List<Integer>> dag = new ArrayList<>();
